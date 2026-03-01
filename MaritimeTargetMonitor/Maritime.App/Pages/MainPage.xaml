@@ -257,7 +257,7 @@
                                 </Border>
                             </DockPanel>
                             <TextBlock Text="直接显示无人机原始流（不经算法）" Foreground="{StaticResource TechMutedBrush}" FontSize="12" TextWrapping="Wrap" Margin="0,0,0,10"/>
-                            <Button x:Name="DirectLiveButton" Content="进入直通模式" Style="{StaticResource TechSecondaryButton}" Click="DirectLiveButton_Click"/>
+                            <Button x:Name="DirectLiveButton" Content="切换模式" Style="{StaticResource TechSecondaryButton}" Click="DirectLiveButton_Click"/>
                         </StackPanel>
                     </Border>
 

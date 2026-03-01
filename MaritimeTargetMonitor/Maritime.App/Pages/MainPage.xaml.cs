@@ -6,6 +6,7 @@ using System.Net;
 using System.Net.Http;
 using System.Net.NetworkInformation;
 using System.Net.Sockets;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -431,12 +432,27 @@ namespace Maritime.App.Pages
         #endregion
 
         #region Direct Live
-        private void DirectLiveButton_Click(object sender, RoutedEventArgs e)
+        private async void DirectLiveButton_Click(object sender, RoutedEventArgs e)
         {
-            ToggleDirectLiveMode();
+            if (DirectLiveButton != null)
+            {
+                DirectLiveButton.IsEnabled = false;
+            }
+
+            try
+            {
+                await ToggleDirectLiveModeAsync();
+            }
+            finally
+            {
+                if (DirectLiveButton != null)
+                {
+                    DirectLiveButton.IsEnabled = true;
+                }
+            }
         }
 
-        private void ToggleDirectLiveMode()
+        private async Task ToggleDirectLiveModeAsync()
         {
             var cfg = AppConfig.Load();
             var current = (cfg?.RtspUrl ?? string.Empty).Trim();
@@ -444,7 +460,7 @@ namespace Maritime.App.Pages
             var changed = false;
             if (isDirect)
             {
-                changed = ApplyAlgorithmLiveMode(cfg, current);
+                changed = await ApplyAlgorithmLiveModeAsync(cfg, current);
             }
             else
             {
@@ -459,7 +475,14 @@ namespace Maritime.App.Pages
             UpdateHomeUrls();
             UpdateDirectLiveStatus();
             StopHomeLive();
-            StartHomeLive();
+            if (isDirect)
+            {
+                _ = StartHomeLiveWhenReadyAsync();
+            }
+            else
+            {
+                StartHomeLive();
+            }
         }
 
         private bool ApplyDirectLiveMode(AppConfig cfg)
@@ -479,12 +502,96 @@ namespace Maritime.App.Pages
             return true;
         }
 
-        private bool ApplyAlgorithmLiveMode(AppConfig cfg, string currentRtsp)
+        private async Task<bool> ApplyAlgorithmLiveModeAsync(AppConfig cfg, string currentRtsp)
         {
+            if (!StartHomeRelay())
+            {
+                MessageBox.Show("转发器未启动，无法切换到算法模式。", "提示", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return false;
+            }
+
+            await RefreshMtxPathAsync(false);
+
+            var prepared = await Task.Run(() => TryPrepareAlgorithmInput(cfg, currentRtsp));
+            if (!prepared.Ok)
+            {
+                MessageBox.Show($"未检测到可用算法输入源，无法切换到算法模式。\n\n{prepared.Detail}",
+                    "提示", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return false;
+            }
+
+            if (!TryStartAlgorithm(cfg, showError: true, keepAlive: true))
+            {
+                return false;
+            }
+
             var host = ResolveRelayHostFromUrl(PreferLoopbackForLocalHost(currentRtsp));
             var rtsp = $"rtsp://{host}:{_config.RelayRtspPort}/live/m3t";
             SaveRtspUrl(cfg, rtsp);
             return true;
+        }
+
+        private (bool Ok, string Detail) TryPrepareAlgorithmInput(AppConfig cfg, string currentRtsp)
+        {
+            var candidates = BuildAlgorithmInputCandidates(cfg, currentRtsp);
+            if (candidates.Count == 0)
+            {
+                return (false, "未配置可用输入源");
+            }
+
+            var failures = new List<string>();
+            foreach (var candidate in candidates)
+            {
+                if (DetectStreamSource(candidate, out var detail, 6000))
+                {
+                    ApplyInputUrl(candidate, "已自动切换可用输入源");
+                    return (true, $"输入源已切换为：{candidate}");
+                }
+
+                if (string.IsNullOrWhiteSpace(detail))
+                {
+                    detail = "未检测到流";
+                }
+                failures.Add($"{candidate} -> {detail}");
+            }
+
+            return (false, string.Join("\n", failures));
+        }
+
+        private List<string> BuildAlgorithmInputCandidates(AppConfig cfg, string currentRtsp)
+        {
+            var candidates = new List<string>();
+
+            AddUniqueCandidate(candidates, (cfg?.AlgorithmInputUrl ?? string.Empty).Trim());
+            AddUniqueCandidate(candidates, (cfg?.DroneStreamUrl ?? string.Empty).Trim());
+            AddUniqueCandidate(candidates, BuildRawRtspCandidate((cfg?.DroneStreamUrl ?? string.Empty).Trim()));
+            AddUniqueCandidate(candidates, BuildRawRtspCandidate(currentRtsp));
+
+            return candidates;
+        }
+
+        private string BuildRawRtspCandidate(string source)
+        {
+            if (string.IsNullOrWhiteSpace(source)) return string.Empty;
+            if (!Uri.TryCreate(source, UriKind.Absolute, out var uri)) return string.Empty;
+
+            if (source.EndsWith("/live/raw", StringComparison.OrdinalIgnoreCase) &&
+                (uri.Scheme.Equals("rtsp", StringComparison.OrdinalIgnoreCase) ||
+                 uri.Scheme.Equals("rtsps", StringComparison.OrdinalIgnoreCase)))
+            {
+                return source.Trim();
+            }
+
+            var host = uri.Host;
+            if (string.IsNullOrWhiteSpace(host)) return string.Empty;
+            return $"rtsp://{host}:{_config.RelayRtspPort}/live/raw";
+        }
+
+        private static void AddUniqueCandidate(List<string> candidates, string value)
+        {
+            if (string.IsNullOrWhiteSpace(value)) return;
+            if (candidates.Any(v => string.Equals(v, value, StringComparison.OrdinalIgnoreCase))) return;
+            candidates.Add(value);
         }
 
         private string ResolveRelayHostFromUrl(string url)
@@ -514,11 +621,19 @@ namespace Maritime.App.Pages
             {
                 DirectLiveStatus.Text = "当前为直通模式";
                 DirectLiveStatus.Foreground = System.Windows.Media.Brushes.DeepSkyBlue;
+                if (DirectLiveButton != null)
+                {
+                    DirectLiveButton.Content = "切换到算法模式";
+                }
             }
             else
             {
                 DirectLiveStatus.Text = "当前为算法模式";
                 DirectLiveStatus.Foreground = System.Windows.Media.Brushes.Gray;
+                if (DirectLiveButton != null)
+                {
+                    DirectLiveButton.Content = "切换到直通模式";
+                }
             }
         }
         #endregion
