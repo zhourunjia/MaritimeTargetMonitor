@@ -1,0 +1,67 @@
+部署路线选择
+
+没有或不稳定网络：用离线包 MaritimeTargetMonitor_Offline_Package.zip。
+有稳定网络：用在线包 MaritimeTargetMonitor_Package.zip，需要运行一键依赖安装。
+前置环境（两条路线通用）
+
+Windows 10/11 64 位。
+.NET Framework 4.8 运行时（运行 WPF 客户端必需）。
+VC++ 2015–2022 x64 运行库（项目内已带安装器）。
+如果使用在线模式后端：JDK 8 + Maven 3.6+。
+路线 A：离线包部署（推荐）
+
+将 MaritimeTargetMonitor_Offline_Package.zip 复制到新机器并解压，例如 D:\MaritimeTargetMonitor_Offline。
+确认关键文件存在：Maritime.App.exe、config.json、mediamtx.exe、ffmpeg.exe、python.exe。
+安装 VC++ 运行库：双击 vc_redist.x64.exe。
+直接运行 Maritime.App.exe。首次启动会弹出 UAC，请允许（它会自动配置防火墙端口 1935/8554/60800）。
+如果机器没有 GPU，确认 config.json 里 AlgorithmUseCpu 为 true（离线包默认已是 true）。
+若要在线登录功能，稍后按“在线模式后端”启动后端并修改配置。
+路线 B：在线包部署（需要联网）
+
+解压 MaritimeTargetMonitor_Package.zip，例如 D:\MaritimeTargetMonitor。
+运行 一键部署.bat。它会下载便携式 Python 3.11.9 并安装推理依赖（requirements_infer.txt）。
+如需完整依赖（训练或额外工具），执行 一键部署.bat full。
+安装 VC++ 运行库：vc_redist.x64.exe。
+运行 Maritime.App.exe。
+如果没有 NVIDIA/TensorRT，务必把 config.json 中 AlgorithmUseCpu 改为 true（在线包默认是 false）。
+在线模式后端（可选，仅在线登录需要）
+
+进入后端目录 MaritimeTargetMonitor/MaritimeBackend。
+启动后端（方式一）：
+mvn spring-boot:run
+启动后端（方式二，先打包再运行）：
+mvn -DskipTests package
+java -jar target/maritime-backend-1.0.0.jar
+后端默认端口是 60800，对应 config.json 的 ServerPort。
+登录账号在后端代码中初始化为 admin / 123456 与 user / 123456（非 prod 环境）。
+客户端 config.json 里把 EnableServer 设为 true，并设置 ServerIP 为后端机器 IP。
+关键配置（config.json）
+
+服务器连接：EnableServer、ServerIP、ServerPort。
+算法链路：
+AlgorithmPythonPath
+AlgorithmScriptPath
+AlgorithmWeightsPath
+AlgorithmFfmpegPath
+推流地址：
+AlgorithmInputUrl 默认 rtmp://127.0.0.1:1935/live/raw
+AlgorithmOutputUrl 默认 rtmp://127.0.0.1:1935/live/m3t
+RtspUrl 默认 rtsp://127.0.0.1:8554/live/m3t
+中转程序：RelayExePath 默认 mediamtx.exe。
+如果使用外部推流设备，把 DroneStreamUrl 改成 rtmp://<本机IP>:1935/live/raw，并确保设备与电脑同一局域网。
+推流说明（与 推流使用说明 一致）
+
+项目中已带 mediamtx.exe（rtsp-simple-server 的后继）。
+页面中选择中转程序路径时可直接指向 mediamtx.exe。
+RTMP 推流地址：rtmp://<本机IP>:1935/live/m3t
+RTSP 拉流地址：rtsp://<本机IP>:8554/live/m3t
+部署验证（可选）
+
+离线包自检脚本：offline_smoke_test.ps1
+算法链路冒烟测试：stream_pipeline_test.ps1
+出问题先看日志：Logs\ 目录。
+常见问题速查
+
+启动闪退：检查 .NET Framework 4.8 与 VC++ 运行库。
+视频无画面：确认 libvlc 目录存在、mediamtx.exe 能启动、端口未被占用。
+算法不跑：检查 AlgorithmPythonPath、AlgorithmWeightsPath、ffmpeg-full 路径。
