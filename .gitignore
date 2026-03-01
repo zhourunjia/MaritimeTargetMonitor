@@ -1,0 +1,15 @@
+# build outputs
+bin/
+obj/
+**/bin/
+**/obj/
+
+# VS
+.vs/
+*.user
+*.suo
+*.cache
+*.log
+
+# packages
+packages/
