@@ -1,0 +1,93 @@
+server:
+  port: 60800
+  servlet:
+    context-path: /
+
+spring:
+  datasource:
+    url: jdbc:h2:mem:maritime
+    username: sa
+    password:
+    driver-class-name: org.h2.Driver
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: true
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+
+# JWT配置
+jwt:
+  secret: maritime_secret_key_1234567890_abcdefghijklmnopqrstuvwxyz
+  expiration: 86400000
+
+# 安全配置
+security:
+  enable-csrf: false
+
+# SpringDoc配置
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+
+# 文件上传配置
+file:
+  upload:
+    # 上传目录，可配置为绝对路径或相对路径
+    base-dir: uploads
+    # 文件大小限制（MB）
+    max-size: 50
+    # 允许的文件类型
+    allowed-types:
+      # 电池数据
+      battery:
+        - application/json
+        - text/plain
+      # 环境数据
+      environment:
+        - application/json
+        - text/plain
+      # 速度数据
+      speed:
+        - application/json
+        - text/plain
+      # 照片
+      photo:
+        - image/jpeg
+        - image/png
+        - image/gif
+        - image/webp
+      # 轨迹
+      trajectory:
+        - application/json
+        - text/plain
+    # 允许的文件扩展名
+    allowed-extensions:
+      # 电池数据
+      battery:
+        - json
+        - txt
+      # 环境数据
+      environment:
+        - json
+        - txt
+      # 速度数据
+      speed:
+        - json
+        - txt
+      # 照片
+      photo:
+        - jpg
+        - jpeg
+        - png
+        - gif
+        - webp
+      # 轨迹
+      trajectory:
+        - json
+        - txt

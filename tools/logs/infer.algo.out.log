@@ -1,0 +1,4 @@
+Params: 41.17M, Gflops: 20.22
+Reparameterizing models...
+After re-parameterization: Params: 40.46M, Gflops: 19.90
+[info] processed 100 frames, 4.6 FPS

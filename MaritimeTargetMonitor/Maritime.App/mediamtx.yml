@@ -1,0 +1,31 @@
+﻿logLevel: info
+logDestinations: [stdout, file]
+logFile: mediamtx.log
+
+rtsp: yes
+rtspAddress: :8554
+rtmp: yes
+rtmpAddress: :1935
+
+api: yes
+apiAddress: :9997
+
+authMethod: internal
+authInternalUsers:
+- user: any
+  pass:
+  permissions:
+  - action: publish
+  - action: read
+  - action: playback
+- user: any
+  pass:
+  ips: ['127.0.0.1', '::1']
+  permissions:
+  - action: api
+
+pathDefaults:
+  source: publisher
+
+paths:
+  all_others:

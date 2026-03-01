@@ -1,0 +1,3 @@
+[warn] CUDA not available, switching to CPU inference.
+[info] processed 100 frames, 28.8 FPS
+[info] processed 200 frames, 26.8 FPS

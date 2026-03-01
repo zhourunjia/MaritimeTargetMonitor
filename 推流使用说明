@@ -1,0 +1,25 @@
+
+准备 rtsp-simple-server：把 rtsp-simple-server.exe 放在任意路径（例如 rtsp-simple-server.exe）。
+启动应用：
+Maritime.App.exe
+在“可视化视频”页：
+“可执行路径”填入 rtsp-simple-server.exe 的完整路径，点【启动】。状态栏会显示“已启动”并生成两条地址：
+RTMP 推流：rtmp://<本机IP>:1935/live/m3t
+RTSP 拉流：rtsp://<本机IP>:8554/live/m3t
+应用会把 RtspUrl 自动写入 config，并立即按该地址拉流到预览窗口。
+RC Pro (DJI Pilot 2)：
+确保 RC Pro 与 PC 同一局域网/热点。
+直播/推流设置选择 RTMP，填：rtmp://<本机IP>:1935/live/m3t，开始直播。
+画面即会出现在应用的实时预览区。
+停止/重启转发器：用页面上的【停止】按钮即可，无需去任务管理器。
+文件/代码要点
+
+UI 与播放：VisualVideo.xaml
+播放/转发控制逻辑：VisualVideo.xaml.cs
+配置：AppConfig.cs 与 config.json
+依赖：Maritime.App.csproj 已引入 LibVLC 包
+注意事项
+
+每次修改 RtspUrl 或转发器端口后，重启应用即可生效。
+若端口被占用或推流/拉流不通，检查防火墙允许 rtsp-simple-server.exe 的入站 TCP 1935、8554，或换端口并同步到 RC 推流地址和 config。
+构建后路径：Maritime.App.exe（已重新编译通过）。

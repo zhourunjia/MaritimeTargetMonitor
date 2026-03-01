@@ -1,0 +1,113 @@
+﻿<UserControl x:Class="Maritime.App.Pages.AlgorithmConfigPanel"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             mc:Ignorable="d"
+             d:DesignHeight="500"
+             d:DesignWidth="900">
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- 场景预设 -->
+        <Border Grid.Row="0" Background="{StaticResource SurfaceAltBrush}" CornerRadius="6" Padding="10">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="200"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <TextBlock Grid.Column="0" Text="场景预设" VerticalAlignment="Center" Margin="0,0,10,0"/>
+                <ComboBox x:Name="SceneComboBox" Grid.Column="1" Margin="0,0,10,0">
+                    <ComboBoxItem Content="实时无人机"/>
+                    <ComboBoxItem Content="本地演示"/>
+                    <ComboBoxItem Content="离线回放"/>
+                </ComboBox>
+                <Button Grid.Column="2" Content="应用预设" Width="100" Click="ApplyPresetButton_Click"/>
+                <TextBlock x:Name="SceneHintText" Grid.Column="3" VerticalAlignment="Center" Foreground="#666666" Margin="10,0,0,0" TextWrapping="Wrap"/>
+            </Grid>
+        </Border>
+
+        <!-- 更多设置 -->
+        <Expander Grid.Row="1" Header="更多设置" Margin="0,10,0,0" IsExpanded="False">
+            <StackPanel>
+                <ScrollViewer VerticalScrollBarVisibility="Auto" Height="420">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="160"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+
+                        <TextBlock Grid.Row="0" Grid.Column="0" Text="Python 路径" VerticalAlignment="Center" Margin="0,0,10,8"/>
+                        <TextBox x:Name="PythonPathBox" Grid.Row="0" Grid.Column="1" Margin="0,0,10,8"/>
+                        <Button Grid.Row="0" Grid.Column="2" Content="浏览" Click="BrowsePython_Click" Margin="0,0,0,8"/>
+
+                        <TextBlock Grid.Row="1" Grid.Column="0" Text="脚本路径" VerticalAlignment="Center" Margin="0,0,10,8"/>
+                        <TextBox x:Name="ScriptPathBox" Grid.Row="1" Grid.Column="1" Margin="0,0,10,8"/>
+                        <Button Grid.Row="1" Grid.Column="2" Content="浏览" Click="BrowseScript_Click" Margin="0,0,0,8"/>
+
+                        <TextBlock Grid.Row="2" Grid.Column="0" Text="权重路径" VerticalAlignment="Center" Margin="0,0,10,8"/>
+                        <TextBox x:Name="WeightsPathBox" Grid.Row="2" Grid.Column="1" Margin="0,0,10,8"/>
+                        <Button Grid.Row="2" Grid.Column="2" Content="浏览" Click="BrowseWeights_Click" Margin="0,0,0,8"/>
+
+                        <TextBlock Grid.Row="3" Grid.Column="0" Text="输入源" VerticalAlignment="Center" Margin="0,0,10,8"/>
+                        <TextBox x:Name="InputUrlBox" Grid.Row="3" Grid.Column="1" Margin="0,0,10,8"/>
+
+                        <TextBlock Grid.Row="4" Grid.Column="0" Text="输出地址" VerticalAlignment="Center" Margin="0,0,10,8"/>
+                        <TextBox x:Name="OutputUrlBox" Grid.Row="4" Grid.Column="1" Margin="0,0,10,8" TextChanged="OutputUrlBox_TextChanged"/>
+
+                        <TextBlock Grid.Row="5" Grid.Column="0" Text="FFmpeg 路径" VerticalAlignment="Center" Margin="0,0,10,8"/>
+                        <TextBox x:Name="FfmpegPathBox" Grid.Row="5" Grid.Column="1" Margin="0,0,10,8"/>
+                        <Button Grid.Row="5" Grid.Column="2" Content="浏览" Click="BrowseFfmpeg_Click" Margin="0,0,0,8"/>
+
+                        <TextBlock Grid.Row="6" Grid.Column="0" Text="输入尺寸" VerticalAlignment="Center" Margin="0,0,10,8"/>
+                        <TextBox x:Name="InputSizeBox" Grid.Row="6" Grid.Column="1" Margin="0,0,10,8" ToolTip="示例：320,320"/>
+
+                        <TextBlock Grid.Row="7" Grid.Column="0" Text="输出尺寸(WxH)" VerticalAlignment="Center" Margin="0,0,10,8"/>
+                        <TextBox x:Name="OutputSizeBox" Grid.Row="7" Grid.Column="1" Margin="0,0,10,8" ToolTip="示例：1280x720"/>
+
+                        <TextBlock Grid.Row="8" Grid.Column="0" Text="目标 FPS" VerticalAlignment="Center" Margin="0,0,10,8"/>
+                        <TextBox x:Name="TargetFpsBox" Grid.Row="8" Grid.Column="1" Margin="0,0,10,8" ToolTip="示例：10-15"/>
+
+                        <CheckBox x:Name="UseCpuCheck" Grid.Row="9" Grid.Column="1" Content="使用 CPU 推理" Margin="0,0,0,8"/>
+                        <CheckBox x:Name="UseTrtCheck" Grid.Row="10" Grid.Column="1" Content="使用 TensorRT" Margin="0,0,0,8"/>
+                        <CheckBox x:Name="AutoStartCheck" Grid.Row="11" Grid.Column="1" Content="启动时自动运行算法" Margin="0,0,0,8"/>
+
+                        <StackPanel Grid.Row="12" Grid.Column="0" Grid.ColumnSpan="3" Orientation="Horizontal">
+                            <TextBlock Text="主页 RTSP 预览：" VerticalAlignment="Center"/>
+                            <TextBlock x:Name="RtspPreviewText" VerticalAlignment="Center" Foreground="#0066cc" Margin="5,0,0,0"/>
+                        </StackPanel>
+                    </Grid>
+                </ScrollViewer>
+
+                <StackPanel Margin="0,10,0,0" Orientation="Horizontal" HorizontalAlignment="Right">
+                    <Button Content="保存" Width="100" Margin="0,0,10,0" Click="SaveButton_Click"/>
+                    <Button Content="刷新" Width="100" Click="ReloadButton_Click"/>
+                </StackPanel>
+            </StackPanel>
+        </Expander>
+    </Grid>
+</UserControl>

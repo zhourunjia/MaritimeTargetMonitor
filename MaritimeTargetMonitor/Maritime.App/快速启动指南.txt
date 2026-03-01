@@ -1,0 +1,117 @@
+# Maritime Target Monitor - 快速启动指南
+
+## 问题：无法直接双击启动
+
+由于您的系统中没有安装.NET SDK和MSBuild命令行工具，无法直接双击批处理文件启动应用程序。
+
+## 解决方案：使用 Visual Studio 运行
+
+### 方法一：使用 Visual Studio 运行（推荐）
+
+1. **打开 Visual Studio**
+   - 启动 Visual Studio（2017或更高版本）
+
+2. **打开解决方案**
+   - 点击"文件" → "打开" → "项目/解决方案"
+   - 导航到：`C:\Users\15666\Desktop\MaritimeTargetMonitor\MaritimeTargetMonitor`
+   - 选择 `MaritimeTargetMonitor.sln` 文件
+   - 点击"打开"
+
+3. **设置启动项目**
+   - 在"解决方案资源管理器"中
+   - 右键点击 `Maritime.App` 项目
+   - 选择"设为启动项目"
+
+4. **运行项目**
+   - 点击"调试" → "开始执行（不调试）"或按 `Ctrl+F5`
+   - 或者点击"调试" → "开始调试"或按 `F5`
+
+5. **登录系统**
+   - 在登录窗口中，取消勾选"在线模式"
+   - 点击"进入系统"按钮
+
+### 方法二：生成可执行文件后双击启动
+
+1. **按照方法一的步骤1-4操作**
+
+2. **生成可执行文件**
+   - 在Visual Studio中，右键点击 `Maritime.App` 项目
+   - 选择"生成"
+   - 等待生成完成
+
+3. **复制可执行文件**
+   - 导航到：`C:\Users\15666\Desktop\MaritimeTargetMonitor\MaritimeTargetMonitor\Maritime.App\bin\Debug\net48`
+   - 复制以下文件到 `Maritime.App` 目录：
+     - `Maritime.App.exe`
+     - `Maritime.App.dll`
+     - `Maritime.Core.dll`
+     - `Maritime.Infrastructure.dll`
+     - `Newtonsoft.Json.dll`
+
+4. **双击启动**
+   - 回到 `Maritime.App` 目录
+   - 双击 `Maritime.App.exe` 文件
+   - 或双击 `启动程序.bat` 文件
+
+## 系统要求
+
+### 必需软件
+- **.NET Framework 4.8** 或更高版本
+- **Visual Studio 2017** 或更高版本（用于开发和运行）
+
+### 可选软件
+- **.NET SDK**（如果需要使用命令行工具）
+- **MSBuild**（如果需要使用命令行构建）
+
+## 常见问题
+
+### 1. Visual Studio 无法打开项目
+
+**可能原因：**
+- Visual Studio 版本过低
+- 未安装 .NET 桌面开发工作负载
+
+**解决方法：**
+- 安装 Visual Studio 2017 或更高版本
+- 在安装时选择 ".NET 桌面开发" 工作负载
+
+### 2. 构建失败
+
+**可能原因：**
+- 缺少依赖项
+- 项目配置错误
+
+**解决方法：**
+- 检查"错误列表"窗口中的错误信息
+- 确保所有依赖项都已正确安装
+- 尝试清理解决方案后重新生成
+
+### 3. 运行时出错
+
+**可能原因：**
+- 配置文件格式错误
+- 缺少必要的运行时组件
+
+**解决方法：**
+- 检查 `config.json` 文件格式是否正确
+- 确保已安装 .NET Framework 4.8
+- 查看日志文件获取详细信息
+
+## 推荐操作流程
+
+1. **首次运行**
+   - 使用 Visual Studio 打开解决方案
+   - 设置 Maritime.App 为启动项目
+   - 按 F5 运行项目
+   - 使用离线模式登录
+
+2. **日常使用**
+   - 使用 Visual Studio 运行（开发调试）
+   - 或生成可执行文件后双击运行（生产环境）
+
+## 技术支持
+
+如遇到问题，请：
+1. 查看 Visual Studio 的"输出"窗口
+2. 检查"错误列表"窗口中的错误信息
+3. 查看日志文件：`Logs/Maritime_YYYYMMDD.log`
